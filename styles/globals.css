@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=David+Libre:wght@400;500;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.container-box-shadow {
+  box-shadow: 0px 0px 10px #ff42d9e3;
+}
+
+.hideScrollBar::-webkit-scrollbar{
+  display: none;
+}
+
+
+.generate {
+  box-shadow: 0px 0px 10px #fd29d2e3;
+}
+
+.generate:hover {
+  box-shadow: 0px 0px 25px #fd0bcde3;
+}
+
+.exploreMoreBuildFocus {
+  box-shadow: 0 0 10px 1000px rgba(0, 0, 0, 0.5), 0px 0px 30px 10px #f93cd367;;
+  
+}
+
+.connect-name-button {
+  background: #4776E6;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #8E54E9, #4776E6);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #8E54E9, #4776E6); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.text-underline {
+  background: linear-gradient(transparent 70%, #6b2a9a 90%);
+}
+
+.text-gradient {
+  background: #AB7DFC;
+  background: linear-gradient(to right, #AB7DFC 0%, #5580F6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.get-started-gradient {
+  background: rgb(171,125,252);
+  background: linear-gradient(180deg, rgba(171,125,252,1) 0%, rgba(85,128,246,1) 100%);
+}
