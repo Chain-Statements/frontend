@@ -1,3 +1,5 @@
 export default {
-    ChainStatement : "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9"
+    ChainStatement : {
+        80001 : "0x5B050d2f04872066778033f68B89e391A79C3c79"
+    }
 }

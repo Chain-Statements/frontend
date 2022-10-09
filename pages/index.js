@@ -4,11 +4,13 @@ import { AiOutlineUser } from "react-icons/ai";
 import { FaPassport } from "react-icons/fa";
 import { BiErrorCircle } from "react-icons/bi";
 import { MdPassword } from "react-icons/md";
-import { useAccount, useSigner } from "wagmi";
+import { chainId, useAccount, useSigner ,useNetwork} from "wagmi";
 import { hideAddress } from "../utils/hideAddress";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import toast from 'react-hot-toast'
 import Head from "next/head";
+import axios from "axios";
 import { ethers } from 'ethers';
 import { Layout } from "../components/Layout";
 import { formatBytes32String, parseBytes32String } from "ethers/lib/utils";
@@ -16,9 +18,9 @@ import { Identity } from "@semaphore-protocol/identity"
 import addresses from "../utils/addresses";
 import contractABI from "../utils/ChainStatement.json";
 
-
 export default function Home() {
   const { address, isConnected, isDisconnected } = useAccount();
+  const { chain } = useNetwork()
   const [startDate, setStartDate] = useState(new Date());
   const [userName, setUserName] = useState("");
   const [passNum, setPassNum] = useState("");
@@ -51,24 +53,35 @@ export default function Home() {
       setIsPassNumCorrect(true);
     }
 
+    if(!isNameCorrect || !isPassNumCorrect || userName.length == 0) return;
+
     let identityParams = userName.replace(" ","");
-    identityParams = identityParams + startDate.getTime();
+    // identityParams = identityParams + startDate.getTime();
     identityParams = identityParams + passNum;
     identityParams = identityParams.toLowerCase();
-    identityParams = identityParams + userPwd;
+    // identityParams = identityParams + userPwd;
 
     let identity = new Identity(identityParams);
-    let otherParam = formatBytes32String("Carlos")
+    console.log("DEBUG : ", identityParams);
+    console.log(process.env.RELAY_URL)
+    try {
+      const data = await axios.post("http://127.0.0.1:8000/join-protocol", {
+        identityCommitment: identity.generateCommitment().toString(),
+        address : address,
+        chainId : chain.id.toString()
+      });
+      console.log(data);
+      if (data.status == 200) {
+          toast.success(`You joined the Greeter group event 🎉 Greet anonymously!`)
+      } else {
+          toast.error("Some error occurred when calling the server, please try again!")
+      }
 
-    const contract = new ethers.Contract(addresses.ChainStatement,contractABI,signer);
+    }catch (e) {
+        console.log(e);
+        toast.error("Transaction can't be perform, make sure you this address hasnt been added before")
+    }
 
-    console.log(identity.generateCommitment(), otherParam);
-
-    const tx = await contract.joinGroup(identity.generateCommitment(),otherParam);
-
-    const receipt = await tx.wait();
-
-    console.log(receipt);
 
   };
 
@@ -76,7 +89,7 @@ export default function Home() {
     <Layout>
       <div className="px-5 pb-5 lg:px-0 lg:pb-0 w-full flex flex-col justify-center items-center">
         <Head>
-          <title>Eth Bogota - Chain Statements</title>
+          {/* <title>Eth Bogota - Chain Statements</title> */}
         </Head>
         <div className="font-david-libre mt-5 lg:mt-10 w-full lg:w-[50%] h-auto bg-[#27292af2] text-white container-box-shadow rounded-lg p-6 ">
           {shortenAddr ? (
@@ -136,9 +149,9 @@ export default function Home() {
                   <div className="flex items-center mt-5">
                     <MdPassword className="text-2xl mr-2" />
                     <input
-                      value={password}
+                      value={userPwd}
                       onChange={(e) => {
-                        setPassword(e.target.value);
+                        setUserPwd(e.target.value);
                       }}
                       type="string"
                       className="px-2 py-1 rounded w-full outline-0 border-b-2 border-white bg-transparent transition focus:bg-[#292d2d]"

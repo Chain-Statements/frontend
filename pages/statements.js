@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { chainId, useAccount, useSigner, useNetwork } from "wagmi";
 import { AiFillFilePdf, AiOutlineClose } from "react-icons/ai";
 import Head from "next/head";
 import { Layout } from "../components/Layout";
@@ -8,12 +8,21 @@ import { AiOutlineUser } from "react-icons/ai";
 import { FaPassport } from "react-icons/fa";
 import { BiErrorCircle } from "react-icons/bi";
 import { MdPassword } from "react-icons/md";
+import { Group } from "@semaphore-protocol/group";
+import { Identity } from "@semaphore-protocol/identity";
+import { generateProof, packToSolidityProof } from "@semaphore-protocol/proof";
 import DatePicker from "react-datepicker";
+import axios from "axios";
 import "react-datepicker/dist/react-datepicker.css";
 import { hideAddress } from "../utils/hideAddress";
+import addresses from "../utils/addresses";
+import toast from 'react-hot-toast'
+import contractABI from "../utils/ChainStatement.json";
+import { ethers, utils } from "ethers";
 
 const Statements = () => {
   const { address, isConnecting, isDisconnected } = useAccount();
+  const { chain } = useNetwork();
   const [isShowPDF, setIsShowPDF] = useState(false);
   const [isConnected, setIsConnected] = useState();
   const [startDate, setStartDate] = useState(new Date());
@@ -21,17 +30,75 @@ const Statements = () => {
   const [passNum, setPassNum] = useState("");
   const [isNameCorrect, setIsNameCorrect] = useState(true);
   const [isPassNumCorrect, setIsPassNumCorrect] = useState(true);
-  const [password, setPassword] = useState();
+  const [userPwd, setUserPwd] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [shortenAddr, setShortenAddr] = useState();
+  const { data: signer } = useSigner();
 
   useEffect(() => {
     setIsConnected(address);
     setShortenAddr(hideAddress(address));
   }, [address]);
 
-  const handleValidateUser = () => {
-    setIsShowPDF(true);
+  const handleValidateUser = async () => {
+    if (!signer || !address) return;
+    // setIsShowPDF(true);
+
+    let identityParams = userName.replace(" ", "");
+    // identityParams = identityParams + startDate.getTime();
+    identityParams = identityParams + passNum;
+    identityParams = identityParams.toLowerCase();
+    // identityParams = identityParams + userPwd;
+
+    console.log("DEBUG : ", identityParams);
+
+    const identity = new Identity(identityParams);
+    // console.log(identity);
+    // const group = new Group();
+    // const groupId = 42;
+    // const wasmFilePath = `./snark-artifacts/semaphore.wasm`
+    // const zkeyFilePath = `./snark-artifacts"/semaphore.zkey`
+    // group.addMember(identity.generateCommitment());
+    // const fullProof = await generateProof(
+    //   identity,
+    //   group,
+    //   BigInt(groupId),
+    //   address
+    // ,{wasmFilePath,zkeyFilePath});
+    // const contract = new ethers.Contract(
+    //   addresses.ChainStatement[chain.id],
+    //   contractABI,
+    //   signer
+    // );
+    // const solidityProof = packToSolidityProof(proof);
+    // const tx = await contract.claimStatement(
+    //   _identity,
+    //   utils.formatBytes32String(address),
+    //   publicSignals.merkleRoot,
+    //   publicSignals.nullifierHash,
+    //   solidityProof
+    // );
+    // const receipt = await tx.wait();
+    // console.log(receipt);
+
+    try {
+      const data = await axios.post("http://127.0.0.1:8000/generate-balance", {
+        identityCommitment: identity.generateCommitment().toString(),
+        address : address,
+        params : identityParams,
+        chainId : chain.id.toString()
+      });
+      console.log(data);
+      if (data.status == 200) {
+          toast.success(`You joined the Greeter group event 🎉 Greet anonymously!`)
+      } else {
+          toast.error("Some error occurred when calling the server, please try again!")
+      }
+
+    }catch (e) {
+        console.log(e);
+        toast.error("Transaction can't be perform, make sure you this address hasnt been added before")
+    }
   };
 
   return (
@@ -123,9 +190,9 @@ const Statements = () => {
                     <div className="flex items-center mt-5">
                       <MdPassword className="text-2xl mr-2" />
                       <input
-                        value={password}
+                        value={userPwd}
                         onChange={(e) => {
-                          setPassword(e.target.value);
+                          setUserPwd(e.target.value);
                         }}
                         type="string"
                         className="px-2 py-1 rounded w-full outline-0 border-b-2 border-white bg-transparent transition focus:bg-[#292d2d]"
