@@ -65,7 +65,7 @@ export default function Home() {
     console.log("DEBUG : ", identityParams);
     console.log(process.env.RELAY_URL)
     try {
-      const data = await axios.post("http://127.0.0.1:8000/join-protocol", {
+      const data = await axios.post("http://127.0.0.1:9002/join-protocol", {
         identityCommitment: identity.generateCommitment().toString(),
         address : address,
         chainId : chain.id.toString()

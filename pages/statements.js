@@ -82,13 +82,14 @@ const Statements = () => {
     // console.log(receipt);
 
     try {
-      const data = await axios.post("http://127.0.0.1:8000/generate-balance", {
+      const data = await axios.post("http://127.0.0.1:9002/get-statement", {
         identityCommitment: identity.generateCommitment().toString(),
         address : address,
+        name : userName,
         params : identityParams,
         chainId : chain.id.toString()
       });
-      console.log(data);
+      console.log(data.data);
       if (data.status == 200) {
           toast.success(`You joined the Greeter group event 🎉 Greet anonymously!`)
       } else {
