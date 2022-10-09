@@ -12,6 +12,7 @@ Unlike ordinary crypto dashboard in web3 or traditional bank statement in web2, 
 - Decentralized Storage of Account Information 🌐
 - Low-cost and lightning-fast Ethereum L2 blockchain ⚡
 - User-friendly decentralised Ethereum scaling platform 💸
+- Build next-gen multichain dApps with Hybrid Compute 🧋
 
 ### Proof of Identity using zero knowledge 😊
 
@@ -42,6 +43,10 @@ We don't want our users to pay high gas fee for just a simple generating chain s
 ### User-friendly decentralised Ethereum scaling platform 💸
 
 User-friendly is also another main consideration for us when we're developing **Chain Statement**. With cheap transaction fee, strong community support and user-friendly characteristics, we deployed our smart contract to [Polygon](https://polygon.technology/).
+
+### Build next-gen multichain dApps with Hybrid Compute 🧋
+
+We deployed our smart contracts to [Boba Network](https://boba.network/) to leverage their low transaction fees (less than 100x of Layer 1) and hybrid compute technology.
 
 ## UI 💜
 
