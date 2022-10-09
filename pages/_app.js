@@ -11,7 +11,7 @@ import { publicProvider } from "wagmi/providers/public";
 import { Toaster } from 'react-hot-toast'
 
 const { chains, provider } = configureChains(
-  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum, chain.goerli, chain.polygonMumbai, chain.localhost],
+  [chain.optimismGoerli, chain.polygonMumbai, chain.localhost],
   [alchemyProvider({ apiKey: process.env.ALCHEMY_ID }), publicProvider()]
 );
 
