@@ -22,6 +22,7 @@ import { ethers, utils } from "ethers";
 
 const Statements = () => {
   const { address, isConnecting, isDisconnected } = useAccount();
+  const [buttonMsg, setBtnMsg] = useState("Generate Account Statements");
   const { chain } = useNetwork();
   const [isShowPDF, setIsShowPDF] = useState(false);
   const [isConnected, setIsConnected] = useState();
@@ -34,6 +35,7 @@ const Statements = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [shortenAddr, setShortenAddr] = useState();
   const { data: signer } = useSigner();
+  const [pdfUrl, setPdf] = useState("");
 
   useEffect(() => {
     setIsConnected(address);
@@ -48,60 +50,40 @@ const Statements = () => {
     // identityParams = identityParams + startDate.getTime();
     identityParams = identityParams + passNum;
     identityParams = identityParams.toLowerCase();
-    // identityParams = identityParams + userPwd;
+    identityParams = identityParams + userPwd;
 
     console.log("DEBUG : ", identityParams);
 
     const identity = new Identity(identityParams);
-    // console.log(identity);
-    // const group = new Group();
-    // const groupId = 42;
-    // const wasmFilePath = `./snark-artifacts/semaphore.wasm`
-    // const zkeyFilePath = `./snark-artifacts"/semaphore.zkey`
-    // group.addMember(identity.generateCommitment());
-    // const fullProof = await generateProof(
-    //   identity,
-    //   group,
-    //   BigInt(groupId),
-    //   address
-    // ,{wasmFilePath,zkeyFilePath});
-    // const contract = new ethers.Contract(
-    //   addresses.ChainStatement[chain.id],
-    //   contractABI,
-    //   signer
-    // );
-    // const solidityProof = packToSolidityProof(proof);
-    // const tx = await contract.claimStatement(
-    //   _identity,
-    //   utils.formatBytes32String(address),
-    //   publicSignals.merkleRoot,
-    //   publicSignals.nullifierHash,
-    //   solidityProof
-    // );
-    // const receipt = await tx.wait();
-    // console.log(receipt);
+    setBtnMsg("Calling Relay")
 
     try {
       const data = await axios.post("http://127.0.0.1:9002/get-statement", {
         identityCommitment: identity.generateCommitment().toString(),
         address : address,
         name : userName,
+        passNum : passNum,
         params : identityParams,
         chainId : chain.id.toString()
       });
       console.log(data.data);
       if (data.status == 200) {
-          toast.success(`You joined the Greeter group event 🎉 Greet anonymously!`)
+          setPdf(`https://${data.data["web3Storage"]}.ipfs.w3s.link/output.pdf`)
+          setIsShowPDF(true)
+          toast.success(`You have succesfully generated a Chain Statement! Print it`)
       } else {
           toast.error("Some error occurred when calling the server, please try again!")
       }
 
     }catch (e) {
         console.log(e);
-        toast.error("Transaction can't be perform, make sure you this address hasnt been added before")
+        toast.error("Transaction can't be perform, make sure you input the right params")
     }
+
+    setBtnMsg("Generate Account Statements")
   };
 
+  console.log(pdfUrl)
   return (
     <Layout>
       <div>
@@ -126,12 +108,12 @@ const Statements = () => {
                     </div>
                   </div>
                   <div className="h-[95%] pb-3">
-                    <iframe
-                      src="https://ipfs.io/ipfs/bafybeicmg4flnzstp422x7qfpnppj3htmjkcpkfqgf4bevuywzortqi4dy/output2.pdf"
+                    {pdfUrl && <iframe
+                      src={pdfUrl}
                       width="100%"
                       height="100%"
                       className="block"
-                    />
+                    />}
                   </div>
                 </div>
               )}
@@ -208,7 +190,7 @@ const Statements = () => {
                         className="flex items-center justify-center  generate p-3 lg:p-5 rounded-full w-fit cursor-pointer transition"
                       >
                         <div className="lg:text-2xl">
-                          Generate Account Statements
+                          {buttonMsg}
                         </div>
                         <AiFillFilePdf className="ml-1 text-3xl" />
                       </div>
